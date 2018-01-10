@@ -1,0 +1,37 @@
+version: '3.1'
+
+services:
+  drupal:
+    image: opendatastack/apache-php-fpm:latest
+    ports:
+      - 80
+    volumes:
+      - .:/var/www/html
+      - ./.docker/etc/php/xdebug.ini:/etc/php/7.0/fpm/conf.d/30-xdebug.ini
+      - ./.docker/etc/php/xdebug.ini:/etc/php/7.0/cli/conf.d/30-xdebug.ini
+    restart: always
+    network_mode: bridge
+    links:
+      - db
+  db:
+    image: wodby/mariadb:latest
+    ports:
+      - 3306
+    environment:
+      - MYSQL_DATABASE=drupal
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=drupal
+      - MYSQL_PASSWORD=admin123
+    restart: always
+    network_mode: bridge
+  proxy:
+    image: traefik
+    command: --web --docker --docker.domain=localtest.me --logLevel=DEBUG
+    network_mode: bridge
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./.docker/traefik.toml:/etc/traefik/traefik.toml

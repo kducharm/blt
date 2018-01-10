@@ -1,0 +1,3 @@
+#!/bin/bash
+HOSTNAME=drupal.blt.localtest.me
+docker-compose exec drupal /bin/sh -c "export PHP_IDE_CONFIG=\"serverName=$HOSTNAME\" && /var/www/html/vendor/bin/drush --root=/var/www/html/docroot --uri=$HOSTNAME $@"
